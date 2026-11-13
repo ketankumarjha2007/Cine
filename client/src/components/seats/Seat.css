@@ -1,78 +1,229 @@
-.seat-item {
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
+/* ── Realistic Theatre Chair ─────────────────────────────────────────── */
+.theatre-chair {
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 600;
+  justify-content: flex-end;
+  width: 32px;
+  height: 34px;
+  background: transparent;
+  border: none;
+  padding: 0;
   cursor: pointer;
-  transition: all var(--transition-fast);
-  border: 1px solid transparent;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.18s ease;
   user-select: none;
   flex-shrink: 0;
+  outline: none;
 }
 
 @media (min-width: 640px) {
-  .seat-item {
-    width: 32px;
-    height: 32px;
+  .theatre-chair {
+    width: 36px;
+    height: 38px;
+  }
+}
+
+/* Headrest */
+.chair-headrest {
+  width: 62%;
+  height: 7px;
+  border-radius: 4px 4px 1px 1px;
+  margin-bottom: 2px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  border: 1px solid transparent;
+}
+
+/* Chair Body (Cushion + Armrests) */
+.chair-body {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 25px;
+}
+
+@media (min-width: 640px) {
+  .chair-body {
+    height: 28px;
+  }
+}
+
+/* Armrests */
+.chair-armrest {
+  width: 3.5px;
+  border-radius: 2px;
+  margin-top: 3px;
+  margin-bottom: 1px;
+  transition: background-color 0.15s ease;
+}
+
+.chair-armrest.left {
+  margin-right: 1.5px;
+}
+
+.chair-armrest.right {
+  margin-left: 1.5px;
+}
+
+/* Seat Cushion */
+.chair-cushion {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px 3px 5px 5px;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.45);
+  transition: all 0.18s ease;
+  border: 1px solid transparent;
+}
+
+.chair-number {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.3px;
+}
+
+@media (min-width: 640px) {
+  .chair-number {
     font-size: 11px;
   }
 }
 
-.seat-number-label {
-  pointer-events: none;
+/* ── Standard Tier: Cinema Indigo ───────────────────────────────────── */
+.chair-available.chair-cat-standard .chair-headrest {
+  background: #1e293b;
+  border-color: #3b82f6;
 }
 
-/* Available States by Category */
-.seat-available.seat-cat-standard {
-  background-color: var(--surface-color);
-  border-color: #3B82F6;
-  color: #93C5FD;
+.chair-available.chair-cat-standard .chair-armrest {
+  background: #334155;
 }
 
-.seat-available.seat-cat-premium {
-  background-color: var(--surface-color);
-  border-color: #A855F7;
-  color: #D8B4FE;
+.chair-available.chair-cat-standard .chair-cushion {
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border-color: #3b82f6;
+  color: #93c5fd;
 }
 
-.seat-available.seat-cat-vip {
-  background-color: var(--surface-color);
-  border-color: #F59E0B;
-  color: #FDE68A;
+/* ── Premium Tier: Royal Violet Velvet ───────────────────────────────── */
+.chair-available.chair-cat-premium .chair-headrest {
+  background: #2e1065;
+  border-color: #a855f7;
 }
 
-.seat-available:hover:not(:disabled) {
-  transform: scale(1.15);
-  box-shadow: 0 0 8px rgba(225, 29, 72, 0.4);
+.chair-available.chair-cat-premium .chair-armrest {
+  background: #4c1d95;
 }
 
-/* Selected State */
-.seat-selected {
-  background-color: var(--color-success) !important;
-  border-color: var(--color-success) !important;
-  color: #0B0B10 !important;
-  font-weight: 700 !important;
-  transform: scale(1.05);
+.chair-available.chair-cat-premium .chair-cushion {
+  background: linear-gradient(180deg, #3b0764 0%, #1e1b4b 100%);
+  border-color: #a855f7;
+  color: #e9d5ff;
 }
 
-/* Held State */
-.seat-held {
-  background-color: rgba(245, 158, 11, 0.2) !important;
-  border-color: rgba(245, 158, 11, 0.4) !important;
-  color: var(--color-warning) !important;
+/* ── VIP / Recliner Tier: Golden Leather Luxury ──────────────────────── */
+.chair-available.chair-cat-vip {
+  width: 36px;
+}
+
+@media (min-width: 640px) {
+  .chair-available.chair-cat-vip {
+    width: 40px;
+  }
+}
+
+.chair-available.chair-cat-vip .chair-headrest {
+  background: #451a03;
+  border-color: #f59e0b;
+  width: 72%;
+}
+
+.chair-available.chair-cat-vip .chair-armrest {
+  background: #78350f;
+  width: 4.5px;
+}
+
+.chair-available.chair-cat-vip .chair-cushion {
+  background: linear-gradient(180deg, #78350f 0%, #292524 100%);
+  border-color: #f59e0b;
+  color: #fef08a;
+  box-shadow: inset 0 -2px 4px rgba(245, 158, 11, 0.2), 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Hover Effect on Available ───────────────────────────────────────── */
+.chair-available:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.1);
+  filter: drop-shadow(0 6px 12px rgba(225, 29, 72, 0.35));
+}
+
+.chair-available:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── Selected State: Vivid Emerald Glow ──────────────────────────────── */
+.chair-selected {
+  transform: translateY(-2px) scale(1.08);
+}
+
+.chair-selected .chair-headrest {
+  background: #059669 !important;
+  border-color: #34d399 !important;
+}
+
+.chair-selected .chair-armrest {
+  background: #047857 !important;
+}
+
+.chair-selected .chair-cushion {
+  background: linear-gradient(180deg, #10b981 0%, #047857 100%) !important;
+  border-color: #6ee7b7 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.6) !important;
+}
+
+/* ── Held State: Caution Amber ───────────────────────────────────────── */
+.chair-held {
+  opacity: 0.55;
   cursor: not-allowed;
-  opacity: 0.6;
 }
 
-/* Booked State */
-.seat-booked {
-  background-color: var(--surface-elevated) !important;
-  border-color: var(--border-color) !important;
-  color: #3E3E50 !important;
+.chair-held .chair-headrest {
+  background: #78350f !important;
+  border-color: #d97706 !important;
+}
+
+.chair-held .chair-armrest {
+  background: #451a03 !important;
+}
+
+.chair-held .chair-cushion {
+  background: #292524 !important;
+  border-color: #d97706 !important;
+  color: #fbbf24 !important;
+}
+
+/* ── Booked State: Cinema Matte Charcoal ─────────────────────────────── */
+.chair-booked {
+  opacity: 0.35;
   cursor: not-allowed;
-  opacity: 0.4;
+}
+
+.chair-booked .chair-headrest {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.chair-booked .chair-armrest {
+  background: #0f172a !important;
+}
+
+.chair-booked .chair-cushion {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+  color: #475569 !important;
+  box-shadow: none !important;
 }

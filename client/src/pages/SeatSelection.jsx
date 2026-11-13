@@ -8,6 +8,7 @@ import { useSeatRealtime } from '../hooks/useSeatRealtime.js';
 import PageShell from '../components/layout/PageShell.jsx';
 import SeatMap from '../components/seats/SeatMap.jsx';
 import SeatLegend from '../components/seats/SeatLegend.jsx';
+import AttendeesSection from '../components/seats/AttendeesSection.jsx';
 import BookingSummaryBar from '../components/seats/BookingSummaryBar.jsx';
 import Spinner from '../components/common/Spinner.jsx';
 import EmptyState from '../components/common/EmptyState.jsx';
@@ -17,8 +18,15 @@ import './SeatSelection.css';
 export default function SeatSelection() {
   const { showId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { selectedShow, setSelectedShow, setActiveBooking } = useBooking();
+  const { user, profile } = useAuth();
+  const {
+    selectedShow,
+    setSelectedShow,
+    setActiveBooking,
+    attendees,
+    updateAttendee,
+    saveAttendeesForBooking
+  } = useBooking();
 
   const [showData, setShowData] = useState(selectedShow);
   const [showLoading, setShowLoading] = useState(!selectedShow);
@@ -99,10 +107,13 @@ export default function SeatSelection() {
       });
 
       const bookingHold = res.data;
+      saveAttendeesForBooking(bookingHold.bookingId, attendees);
+
       setActiveBooking({
         ...bookingHold,
         show: showData,
-        seats: selectedSeats
+        seats: selectedSeats,
+        attendees
       });
 
       navigate(`/checkout/${bookingHold.bookingId}`);
@@ -173,11 +184,21 @@ export default function SeatSelection() {
             <Spinner size="lg" />
           </div>
         ) : (
-          <SeatMap
-            seats={seats}
-            selectedSeats={selectedSeats}
-            onToggleSeat={handleToggleSeat}
-          />
+          <>
+            <SeatMap
+              seats={seats}
+              selectedSeats={selectedSeats}
+              onToggleSeat={handleToggleSeat}
+            />
+
+            {/* Member & Attendee Information */}
+            <AttendeesSection
+              attendees={attendees}
+              selectedSeats={selectedSeats}
+              onUpdateAttendee={updateAttendee}
+              onRemoveSeat={handleToggleSeat}
+            />
+          </>
         )}
       </div>
 

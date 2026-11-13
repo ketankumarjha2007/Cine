@@ -1,5 +1,6 @@
 import React from 'react';
 import Seat from './Seat.jsx';
+import { Sparkles, Crown } from 'lucide-react';
 import './SeatMap.css';
 
 export default function SeatMap({
@@ -8,7 +9,6 @@ export default function SeatMap({
   onToggleSeat
 }) {
   // Group seats by category and then by row
-  // Sort rows alphabetically
   const rowsMap = new Map();
 
   seats.forEach((seat) => {
@@ -28,10 +28,11 @@ export default function SeatMap({
     a.rowLabel.localeCompare(b.rowLabel)
   );
 
-  // Group into category sections
+  // Group into category sections: VIP first (or top to bottom), Premium, Standard
+  const categoryOrder = { 'VIP': 1, 'Premium': 2, 'Standard': 3 };
   const categorySectionsMap = new Map();
+
   sortedRows.forEach((row) => {
-    // Sort seats in row by seat_number
     row.seats.sort((a, b) => a.seat_number - b.seat_number);
 
     if (!categorySectionsMap.has(row.category)) {
@@ -40,38 +41,59 @@ export default function SeatMap({
     categorySectionsMap.get(row.category).push(row);
   });
 
+  const sortedCategories = Array.from(categorySectionsMap.entries()).sort(
+    ([catA], [catB]) => (categoryOrder[catA] || 99) - (categoryOrder[catB] || 99)
+  );
+
   const selectedSeatIds = new Set(selectedSeats.map((s) => s.seat_id));
 
   return (
-    <div className="seat-map-wrapper">
-      {/* Screen Curved Indicator */}
-      <div className="seat-screen-indicator-box">
-        <div className="seat-screen-arc" />
-        <span className="seat-screen-label">ALL EYES THIS WAY • SCREEN</span>
+    <div className="theatre-stage-wrapper">
+      {/* Realistic 3D Curved Cinema Screen */}
+      <div className="theatre-screen-perspective">
+        <div className="theatre-projector-beam" />
+        <div className="theatre-curved-screen-bar">
+          <div className="theatre-screen-glow-line" />
+          <div className="theatre-screen-canvas">
+            <span className="theatre-screen-text">CURVED AUDITORIUM SCREEN • ALL EYES THIS WAY</span>
+          </div>
+        </div>
       </div>
 
-      {/* Auditorium Seating Area with Horizontal Scroll on Mobile */}
-      <div className="seat-map-scroll-area">
-        <div className="seat-map-container" role="grid" aria-label="Auditorium Seating Matrix">
-          {Array.from(categorySectionsMap.entries()).map(([catName, rows]) => {
+      {/* Auditorium Seating Floor with Horizontal Pan for Mobile */}
+      <div className="theatre-seating-floor-scroll">
+        <div className="theatre-seating-matrix" role="grid" aria-label="Auditorium Seating Matrix">
+          {sortedCategories.map(([catName, rows]) => {
             const samplePrice = rows[0]?.seats[0]?.price || 200;
+            const isVip = catName.toLowerCase() === 'vip';
+
             return (
-              <div key={catName} className="seat-category-tier-section">
-                <div className="category-tier-heading">
-                  <span className="tier-name">{catName} Tier</span>
-                  <span className="tier-price">INR {samplePrice}</span>
+              <div key={catName} className={`theatre-tier-section tier-${catName.toLowerCase()}`}>
+                <div className="theatre-tier-header">
+                  <div className="tier-header-left">
+                    {isVip ? (
+                      <Crown size={14} className="tier-vip-icon" />
+                    ) : (
+                      <Sparkles size={13} className="tier-icon" />
+                    )}
+                    <span className="tier-title">{catName} Tier</span>
+                    {isVip && <span className="tier-pill-badge">Plush Recliners</span>}
+                  </div>
+                  <span className="tier-price-badge">INR {samplePrice}</span>
                 </div>
 
-                <div className="category-rows-group">
+                <div className="theatre-tier-rows">
                   {rows.map((row) => (
-                    <div key={row.rowLabel} className="seat-row" role="row">
-                      <span className="seat-row-label left" aria-hidden="true">
+                    <div key={row.rowLabel} className="theatre-row-line" role="row">
+                      {/* Left Row Indicator */}
+                      <div className="theatre-row-badge left" aria-hidden="true">
                         {row.rowLabel}
-                      </span>
+                      </div>
 
-                      <div className="seat-row-cells">
+                      {/* Seats in Row */}
+                      <div className="theatre-row-seats">
                         {row.seats.map((st, sIdx) => {
-                          // Aisle gap after every 6 seats if row has more than 10 seats
+                          // Aisle gap every 6 seats if row is wide
                           const addAisle = (sIdx + 1) % 6 === 0 && sIdx + 1 < row.seats.length;
                           return (
                             <React.Fragment key={st.seat_id}>
@@ -80,15 +102,20 @@ export default function SeatMap({
                                 isSelected={selectedSeatIds.has(st.seat_id)}
                                 onToggle={onToggleSeat}
                               />
-                              {addAisle && <div className="seat-aisle-spacer" aria-hidden="true" />}
+                              {addAisle && (
+                                <div className="theatre-aisle-path" aria-hidden="true">
+                                  <span className="aisle-marker" />
+                                </div>
+                              )}
                             </React.Fragment>
                           );
                         })}
                       </div>
 
-                      <span className="seat-row-label right" aria-hidden="true">
+                      {/* Right Row Indicator */}
+                      <div className="theatre-row-badge right" aria-hidden="true">
                         {row.rowLabel}
-                      </span>
+                      </div>
                     </div>
                   ))}
                 </div>

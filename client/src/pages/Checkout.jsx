@@ -16,7 +16,8 @@ export default function Checkout() {
   const { bookingId } = useParams();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const { activeBooking } = useBooking();
+  const { activeBooking, getAttendeesForBooking } = useBooking();
+  const attendees = getAttendeesForBooking(bookingId) || activeBooking?.attendees || [];
 
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -218,6 +219,27 @@ export default function Checkout() {
                   ))}
                 </div>
               </div>
+
+              {attendees.length > 0 && (
+                <>
+                  <div className="checkout-divider" />
+                  <div className="checkout-members-info">
+                    <span className="seats-heading">Attending Members ({attendees.length})</span>
+                    <div className="checkout-members-list">
+                      {attendees.map((att, idx) => (
+                        <div key={idx} className="checkout-member-item">
+                          <span className="member-name-tag">
+                            <strong>{att.name || `Member ${idx + 1}`}</strong>
+                            {att.age ? ` (${att.age} yrs)` : ''}
+                            {att.gender && att.gender !== 'Not Specified' ? ` • ${att.gender}` : ''}
+                          </span>
+                          <span className="member-seat-badge">{att.seatLabel || `Seat ${idx + 1}`}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Cancellation Policy Notice */}

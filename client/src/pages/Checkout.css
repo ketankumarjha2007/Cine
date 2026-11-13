@@ -228,3 +228,47 @@
   color: var(--text-muted);
   text-align: center;
 }
+
+/* ── Checkout Members List ── */
+.checkout-members-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.checkout-members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.checkout-member-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.member-name-tag {
+  color: var(--text-primary);
+}
+
+.member-name-tag strong {
+  color: var(--text-primary);
+  margin-right: 4px;
+}
+
+.member-seat-badge {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: rgba(225, 29, 72, 0.1);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(225, 29, 72, 0.2);
+}

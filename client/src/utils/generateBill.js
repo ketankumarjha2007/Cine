@@ -185,17 +185,43 @@ export async function generateBill(booking) {
   // ── Reserved Seats Breakdown Table ──────────────────────────────────────
   currentY += metaBoxHeight + 8;
 
-  const tableRows = (booking.booking_seats || []).map((bs, index) => [
-    String(index + 1).padStart(2, '0'),
-    `Row ${bs.seat?.row_label || '—'}, Seat ${bs.seat?.seat_number || '—'}`,
-    bs.seat?.category || 'Standard',
-    formatTimeIST(booking.shows?.starts_at),
-    `INR ${Number(bs.price || 0).toFixed(2)}`
-  ]);
+  let savedAttendees = [];
+  try {
+    const raw = localStorage.getItem(`cineticket_attendees_${booking.id}`);
+    if (raw) savedAttendees = JSON.parse(raw);
+  } catch {}
+
+  const hasAttendees = savedAttendees.length > 0;
+  const tableHead = hasAttendees
+    ? [['#', 'Reserved Seat', 'Attending Member', 'Tier Category', 'Amount']]
+    : [['#', 'Reserved Seat Label', 'Tier Category', 'Screening Slot', 'Amount']];
+
+  const tableRows = (booking.booking_seats || []).map((bs, index) => {
+    const att = savedAttendees[index];
+    const memberDesc = att?.name
+      ? `${att.name}${att.age ? ` (${att.age} yrs)` : ''}`
+      : (booking.customerName || 'Valued Customer');
+
+    return hasAttendees
+      ? [
+          String(index + 1).padStart(2, '0'),
+          `Row ${bs.seat?.row_label || '—'}-${bs.seat?.seat_number || '—'}`,
+          memberDesc,
+          bs.seat?.category || 'Standard',
+          `INR ${Number(bs.price || 0).toFixed(2)}`
+        ]
+      : [
+          String(index + 1).padStart(2, '0'),
+          `Row ${bs.seat?.row_label || '—'}, Seat ${bs.seat?.seat_number || '—'}`,
+          bs.seat?.category || 'Standard',
+          formatTimeIST(booking.shows?.starts_at),
+          `INR ${Number(bs.price || 0).toFixed(2)}`
+        ];
+  });
 
   autoTable(doc, {
     startY: currentY,
-    head: [['#', 'Reserved Seat Label', 'Tier Category', 'Screening Slot', 'Amount']],
+    head: tableHead,
     body: tableRows,
     theme: 'grid',
     headStyles: {
