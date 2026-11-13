@@ -1,12 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Ticket, Film } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext.jsx';
 import Button from '../common/Button.jsx';
 import EmptyState from '../common/EmptyState.jsx';
 import './HeroCarousel.css';
 
 export default function HeroCarousel({ banners = [], fallbackMovies = [] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleBookClick = (e, linkUrl) => {
+    e.preventDefault();
+    if (!user) {
+      navigate('/login', {
+        state: { from: { pathname: linkUrl } }
+      });
+      return;
+    }
+    navigate(linkUrl);
+  };
 
   // Determine slides: priority banners, fallback movie backdrops
   const slides = banners.length > 0
@@ -73,11 +87,14 @@ export default function HeroCarousel({ banners = [], fallbackMovies = [] }) {
               <p className="hero-slide-subtitle">{currentSlide.subtitle}</p>
             )}
             <div className="hero-slide-actions">
-              <Link to={currentSlide.link_url}>
-                <Button variant="primary" size="lg" icon={Ticket}>
-                  Book Now
-                </Button>
-              </Link>
+              <Button
+                variant="primary"
+                size="lg"
+                icon={Ticket}
+                onClick={(e) => handleBookClick(e, currentSlide.link_url)}
+              >
+                Book Now
+              </Button>
             </div>
           </div>
         </div>

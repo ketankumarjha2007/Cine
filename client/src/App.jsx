@@ -47,7 +47,14 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/movie/:id" element={<MovieDetails />} />
             <Route path="/theatres" element={<ShowSelection />} />
-            <Route path="/seats/:showId" element={<SeatSelection />} />
+            <Route
+              path="/seats/:showId"
+              element={
+                <ProtectedRoute>
+                  <SeatSelection />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Auth Routes */}
             <Route path="/login" element={<Login />} />

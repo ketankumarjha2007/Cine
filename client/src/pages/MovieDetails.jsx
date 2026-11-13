@@ -5,6 +5,7 @@ import { supabase } from '../services/supabase.js';
 import api from '../services/api.js';
 import { useLocationContext } from '../context/LocationContext.jsx';
 import { useBooking } from '../context/BookingContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import { calculateDistanceKm } from '../utils/distance.js';
 import { formatDuration, formatDateIST } from '../utils/format.js';
 import PageShell from '../components/layout/PageShell.jsx';
@@ -21,6 +22,7 @@ export default function MovieDetails() {
   const navigate = useNavigate();
   const { selectedCity, coordinates } = useLocationContext();
   const { setSelectedShow } = useBooking();
+  const { user } = useAuth();
 
   const [movie, setMovie] = useState(null);
   const [cast, setCast] = useState([]);
@@ -189,6 +191,13 @@ export default function MovieDetails() {
   });
 
   const handleSelectShow = (show) => {
+    if (!user) {
+      navigate('/login', {
+        state: { from: { pathname: `/seats/${show.id}` } }
+      });
+      return;
+    }
+
     setSelectedShow({
       ...show,
       movie
