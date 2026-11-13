@@ -179,22 +179,39 @@ export const bookingService = {
 
     const { data: booking, error } = await query.single();
     if (error || !booking) {
-      throw new Error('Booking not found or access denied');
+      const notFoundErr = new Error('Booking not found or access denied');
+      notFoundErr.status = 404;
+      notFoundErr.isPublic = true;
+      throw notFoundErr;
     }
 
-    // Get user profile email
-    const { data: profile } = await supabaseAdmin
-      .from('profiles')
-      .select('full_name')
-      .eq('id', booking.user_id)
-      .single();
+    // Get user profile email safely
+    let customerName = 'Valued Customer';
+    let customerEmail = '';
 
-    const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(booking.user_id);
+    try {
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('full_name')
+        .eq('id', booking.user_id)
+        .maybeSingle();
+
+      if (profile?.full_name) {
+        customerName = profile.full_name;
+      }
+
+      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(booking.user_id);
+      if (authUser?.user?.email) {
+        customerEmail = authUser.user.email;
+      }
+    } catch (userErr) {
+      console.warn('[BOOKING DETAILS] Could not fetch customer profile info:', userErr.message);
+    }
 
     return {
       ...booking,
-      customerName: profile?.full_name || 'Valued Customer',
-      customerEmail: authUser?.user?.email || ''
+      customerName,
+      customerEmail
     };
   },
 

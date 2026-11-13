@@ -6,6 +6,7 @@ import { validate } from '../middleware/validate.js';
 import { supabaseAdmin } from '../config/supabase.js';
 import { tmdbService } from '../services/tmdbService.js';
 import { reportService } from '../services/reportService.js';
+import { bookingService } from '../services/bookingService.js';
 
 const router = Router();
 
