@@ -18,10 +18,11 @@ BEGIN
     INSERT INTO public.profiles (id, full_name, role)
     VALUES (
         new.id,
-        COALESCE(new.raw_user_meta_data->>'full_name', ''),
+        COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', ''),
         'user'
     )
-    ON CONFLICT (id) DO NOTHING;
+    ON CONFLICT (id) DO UPDATE SET
+        full_name = COALESCE(NULLIF(EXCLUDED.full_name, ''), profiles.full_name);
     RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
