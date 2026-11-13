@@ -2,6 +2,19 @@ import React from 'react';
 import { Filter, X } from 'lucide-react';
 import './FilterBar.css';
 
+const LANGUAGE_LABELS = {
+  en: 'English',
+  hi: 'Hindi',
+  te: 'Telugu',
+  ta: 'Tamil',
+  ml: 'Malayalam',
+  kn: 'Kannada',
+  bn: 'Bengali',
+  mr: 'Marathi',
+  pa: 'Punjabi',
+  gu: 'Gujarati'
+};
+
 export default function FilterBar({
   selectedLanguage,
   onLanguageChange,
@@ -13,12 +26,17 @@ export default function FilterBar({
 }) {
   const hasActiveFilters = Boolean(selectedLanguage || selectedGenre);
 
+  const getLanguageLabel = (lang) => {
+    const lower = lang.toLowerCase();
+    return LANGUAGE_LABELS[lower] || lang.toUpperCase();
+  };
+
   return (
     <div className="filter-bar-root">
       <div className="filter-bar-header">
         <div className="filter-title-box">
-          <Filter size={16} className="filter-header-icon" />
-          <span className="filter-title-text">Filters</span>
+          <Filter size={15} className="filter-header-icon" />
+          <span className="filter-title-text">Filter Movies</span>
         </div>
         {hasActiveFilters && (
           <button
@@ -26,8 +44,8 @@ export default function FilterBar({
             className="filter-clear-btn"
             onClick={onReset}
           >
-            <X size={14} />
-            <span>Clear filters</span>
+            <X size={13} />
+            <span>Reset filters</span>
           </button>
         )}
       </div>
@@ -51,7 +69,7 @@ export default function FilterBar({
                 className={`filter-chip ${selectedLanguage === lang ? 'active' : ''}`}
                 onClick={() => onLanguageChange(lang)}
               >
-                {lang}
+                {getLanguageLabel(lang)}
               </button>
             ))}
           </div>

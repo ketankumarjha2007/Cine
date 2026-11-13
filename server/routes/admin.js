@@ -570,6 +570,18 @@ router.get('/bookings', async (req, res, next) => {
   }
 });
 
+router.get('/bookings/:id', async (req, res, next) => {
+  try {
+    const booking = await bookingService.getBookingDetails({
+      bookingId: req.params.id,
+      isAdmin: true
+    });
+    res.status(200).json({ booking });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/reports', async (req, res, next) => {
   try {
     const { from, to } = req.query;

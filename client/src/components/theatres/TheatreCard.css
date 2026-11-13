@@ -3,27 +3,37 @@
   flex-direction: column;
   background-color: var(--surface-color);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  transition: transform var(--transition-fast), border-color var(--transition-fast);
+  cursor: pointer;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  position: relative;
 }
 
 .theatre-card-root:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-subtle);
+  transform: translateY(-4px);
+  border-color: var(--accent-primary);
+  box-shadow: 0 8px 24px rgba(225, 29, 72, 0.2);
 }
 
 .theatre-card-image-box {
   position: relative;
   width: 100%;
-  height: 140px;
+  height: 160px;
   background-color: var(--surface-elevated);
+  overflow: hidden;
 }
 
 .theatre-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.theatre-card-root:hover .theatre-card-img {
+  transform: scale(1.05);
 }
 
 .theatre-card-placeholder {
@@ -33,6 +43,28 @@
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
+}
+
+.theatre-card-overlay-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all var(--transition-fast);
+}
+
+.theatre-card-root:hover .theatre-card-overlay-badge {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .theatre-distance-badge {
@@ -65,7 +97,7 @@
 
 .theatre-card-name {
   font-size: var(--font-size-md);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
   margin: 0;
 }
@@ -83,6 +115,7 @@
 .address-pin-icon {
   flex-shrink: 0;
   margin-top: 1px;
+  color: var(--accent-primary);
 }
 
 .theatre-amenities-row {
@@ -94,9 +127,128 @@
 
 .theatre-amenity-pill {
   font-size: 10px;
+  font-weight: 500;
   background-color: var(--surface-elevated);
   color: var(--text-secondary);
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
+}
+
+.theatre-amenity-pill.more {
+  background-color: transparent;
+  color: var(--accent-primary);
+  border-color: rgba(225, 29, 72, 0.3);
+}
+
+/* Modal Content Styles */
+.theatre-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.theatre-modal-image-wrapper {
+  width: 100%;
+  height: 200px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background-color: var(--surface-elevated);
+}
+
+.theatre-modal-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.theatre-modal-info-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.theatre-modal-location-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--surface-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.theatre-modal-pin {
+  color: var(--accent-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.theatre-modal-full-address {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.theatre-modal-city-state {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.theatre-modal-distance {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-success);
+  padding: 0 var(--space-1);
+}
+
+.theatre-modal-amenities-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.theatre-modal-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.theatre-modal-amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.theatre-modal-amenity-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.amenity-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.theatre-modal-actions {
+  margin-top: var(--space-2);
 }

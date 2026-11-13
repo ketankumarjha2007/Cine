@@ -46,7 +46,7 @@ export default function AdminBookings() {
   const handleViewDetails = async (booking) => {
     try {
       setFetchingDetail(true);
-      const res = await api.get(`/bookings/${booking.id}`);
+      const res = await api.get(`/admin/bookings/${booking.id}`);
       setSelectedBooking(res.data.booking);
       setDetailModalOpen(true);
     } catch (err) {

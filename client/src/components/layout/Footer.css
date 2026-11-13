@@ -69,13 +69,22 @@
   gap: var(--space-2);
 }
 
-.footer-links a {
+.footer-links a,
+.footer-policy-btn {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition-fast);
 }
 
-.footer-links a:hover {
+.footer-links a:hover,
+.footer-policy-btn:hover {
   color: var(--text-primary);
+  text-decoration: underline;
 }
 
 .footer-contact-item {
@@ -142,4 +151,81 @@
   font-size: var(--font-size-xs);
   color: var(--text-muted);
   margin: 0;
+}
+
+/* Policy Modal Styles */
+.policy-modal-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: var(--space-2);
+}
+
+.policy-modal-header-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: rgba(225, 29, 72, 0.08);
+  border: 1px solid rgba(225, 29, 72, 0.2);
+  color: var(--accent-primary);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.policy-badge-icon {
+  flex-shrink: 0;
+}
+
+.policy-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+
+.policy-lead {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  font-weight: 500;
+  border-left: 3px solid var(--accent-primary);
+  padding-left: var(--space-3);
+  margin: 0;
+}
+
+.policy-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.policy-section h4 {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.policy-section ul {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.policy-section li {
+  line-height: 1.5;
+}
+
+.policy-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-color);
 }

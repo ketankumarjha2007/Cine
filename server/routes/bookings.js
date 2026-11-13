@@ -4,6 +4,7 @@ import { authenticateUser } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { bookingService } from '../services/bookingService.js';
 import { paymentLimiter } from '../middleware/rateLimit.js';
+import { supabaseAdmin } from '../config/supabase.js';
 
 const router = Router();
 
@@ -71,9 +72,19 @@ router.get('/me', authenticateUser, async (req, res, next) => {
 // GET /api/bookings/:id
 router.get('/:id', authenticateUser, validate(idParamSchema), async (req, res, next) => {
   try {
+    // Check if requester has admin role in profiles
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('role')
+      .eq('id', req.user.id)
+      .maybeSingle();
+
+    const isAdmin = profile?.role === 'admin';
+
     const booking = await bookingService.getBookingDetails({
       bookingId: req.params.id,
-      userId: req.user.id
+      userId: req.user.id,
+      isAdmin
     });
     res.status(200).json({ booking });
   } catch (error) {
