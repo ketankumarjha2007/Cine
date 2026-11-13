@@ -1,0 +1,90 @@
+.seat-legend-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background-color: var(--surface-color);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  margin-bottom: var(--space-6);
+}
+
+.legend-statuses {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.legend-sample {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+}
+
+.sample-available {
+  background-color: var(--surface-color);
+  border-color: #3B82F6;
+}
+
+.sample-selected {
+  background-color: var(--color-success);
+}
+
+.sample-held {
+  background-color: rgba(245, 158, 11, 0.3);
+  border-color: var(--color-warning);
+}
+
+.sample-booked {
+  background-color: var(--surface-elevated);
+  border-color: var(--border-color);
+}
+
+.legend-categories {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border-subtle);
+  width: 100%;
+}
+
+.legend-cat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+}
+
+.cat-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+}
+
+.cat-indicator.cat-standard { background-color: #3B82F6; }
+.cat-indicator.cat-premium { background-color: #A855F7; }
+.cat-indicator.cat-vip { background-color: #F59E0B; }
+
+.cat-name {
+  color: var(--text-muted);
+}
+
+.cat-price {
+  font-weight: 600;
+  color: var(--text-primary);
+}

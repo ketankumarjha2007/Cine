@@ -1,0 +1,52 @@
+.theatre-name-row {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.theatre-sub-row {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.coords-text {
+  font-family: monospace;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.theatre-form-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.form-row-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+@media (min-width: 640px) {
+  .form-row-grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.theatre-map-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.geocode-helper-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.geocode-search-input {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  padding: 6px 12px;
+}

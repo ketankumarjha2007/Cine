@@ -1,0 +1,54 @@
+.movie-row-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-10);
+}
+
+.movie-row-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.movie-row-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.movie-row-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.movie-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .movie-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .movie-cards-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .movie-cards-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.skeleton-movie-card {
+  display: flex;
+  flex-direction: column;
+}

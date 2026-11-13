@@ -1,0 +1,41 @@
+.form-field-root {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--space-4);
+  width: 100%;
+}
+
+.form-field-label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.field-required-asterisk {
+  color: var(--accent-primary);
+  margin-left: 3px;
+}
+
+.form-field-control {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field-help {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.form-field-error {
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.has-error input,
+.has-error select,
+.has-error textarea {
+  border-color: var(--color-danger);
+}

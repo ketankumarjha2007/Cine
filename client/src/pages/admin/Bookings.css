@@ -1,0 +1,96 @@
+.booking-code-pill {
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background-color: var(--accent-primary-subtle);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 1px;
+}
+
+.booking-movie-text {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.booking-theatre-text {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.booking-inspect-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.inspect-status-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.inspect-timestamp {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.inspect-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inspect-section-title {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.inspect-line {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.inspect-line strong {
+  color: var(--text-primary);
+}
+
+.inspect-seats-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: 4px;
+}
+
+.inspect-seat-chip {
+  font-size: var(--font-size-xs);
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+}
+
+.inspect-pricing-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.inspect-pricing-row.total {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--text-primary);
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--border-color);
+  margin-top: var(--space-2);
+}

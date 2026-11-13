@@ -1,0 +1,68 @@
+.location-picker-modal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.location-detect-row {
+  margin-bottom: var(--space-2);
+}
+
+.location-search-box {
+  width: 100%;
+}
+
+.location-search-input {
+  width: 100%;
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
+}
+
+.location-cities-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+@media (min-width: 480px) {
+  .location-cities-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.city-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-3);
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.city-pill:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--accent-primary);
+}
+
+.city-pill-active {
+  background-color: var(--accent-primary-subtle);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.city-pill-check {
+  color: var(--accent-primary);
+}

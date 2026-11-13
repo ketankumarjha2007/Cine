@@ -1,0 +1,252 @@
+.my-bookings-page-container {
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-16);
+  max-width: 920px;
+}
+
+.my-bookings-header {
+  margin-bottom: var(--space-6);
+}
+
+.my-bookings-title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.my-bookings-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.bookings-tabs-bar {
+  display: flex;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 2px;
+  margin-bottom: var(--space-6);
+  overflow-x: auto;
+}
+
+.booking-tab-btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+
+.booking-tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.booking-tab-btn.active {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.bookings-loading-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+}
+
+.bookings-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.user-booking-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (min-width: 768px) {
+  .user-booking-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.user-booking-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.user-booking-poster {
+  width: 56px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.user-booking-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.booking-top-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.user-booking-code {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: var(--font-size-xs);
+  color: var(--accent-primary);
+  letter-spacing: 1px;
+}
+
+.user-booking-movie-title {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.user-booking-theatre {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.user-booking-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.user-booking-meta-row span {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.user-booking-seats-text strong {
+  color: var(--color-success);
+}
+
+.user-booking-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+@media (min-width: 768px) {
+  .user-booking-right {
+    align-items: flex-end;
+  }
+}
+
+.user-booking-price-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+@media (min-width: 768px) {
+  .user-booking-price-box {
+    align-items: flex-end;
+  }
+}
+
+.price-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.price-amount {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.user-booking-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Cancel Dialog */
+.cancel-confirm-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cancel-warning-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background-color: var(--color-danger-bg);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+}
+
+.cancel-warning-icon {
+  color: var(--color-danger);
+  flex-shrink: 0;
+}
+
+.cancel-warning-text {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cancel-summary-box {
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cancel-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.cancel-line strong {
+  color: var(--text-primary);
+}
+
+.refund-highlight {
+  color: var(--color-success) !important;
+  font-size: var(--font-size-md);
+}
+
+.refund-terms-note {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}

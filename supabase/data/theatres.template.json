@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Template schema and empty array container for importing real theatre data. No invented entries.",
+  "itemFieldsDocumentation": {
+    "name": "Full official name of theatre (string, required)",
+    "address": "Street address and locality (string, required)",
+    "city": "City name (string, required)",
+    "state": "State or union territory (string, required)",
+    "pincode": "Postal code (string, required)",
+    "latitude": "WGS84 latitude coordinate (number, required)",
+    "longitude": "WGS84 longitude coordinate (number, required)",
+    "image_url": "Direct URL or Supabase storage path to theatre image (string, optional)",
+    "amenities": "List of amenities e.g. ['4K Laser', 'Dolby Atmos', 'Recliner Seats', 'Wheelchair Accessible'] (array of strings, optional)"
+  },
+  "theatres": []
+}

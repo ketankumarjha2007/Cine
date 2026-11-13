@@ -1,0 +1,44 @@
+.show-movie-title {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.show-theatre-title {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.show-time-main {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.show-details-sub {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.show-overlap-error-box {
+  background-color: var(--color-danger-bg);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: var(--color-danger);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.show-overlap-error-box .error-icon {
+  flex-shrink: 0;
+}
+
+.pricing-config-group {
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}

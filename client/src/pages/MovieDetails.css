@@ -1,0 +1,339 @@
+.movie-details-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.movie-header-backdrop-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+  background-color: var(--surface-color);
+  overflow: hidden;
+}
+
+.movie-backdrop-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  opacity: 0.35;
+  filter: blur(2px);
+}
+
+.backdrop-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(11, 11, 16, 0.4) 0%,
+    rgba(11, 11, 16, 0.85) 60%,
+    rgba(11, 11, 16, 1) 100%
+  );
+}
+
+.movie-header-content {
+  position: relative;
+  z-index: 2;
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
+}
+
+.movie-header-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .movie-header-grid {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-8);
+  }
+}
+
+.movie-poster-box {
+  width: 180px;
+  aspect-ratio: 2/3;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+  background-color: var(--surface-elevated);
+}
+
+@media (min-width: 768px) {
+  .movie-poster-box {
+    width: 220px;
+  }
+}
+
+.movie-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.poster-empty-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.movie-info-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .movie-info-box {
+    text-align: left;
+  }
+}
+
+.movie-title-heading {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.15;
+}
+
+.movie-tags-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+@media (min-width: 768px) {
+  .movie-tags-row {
+    justify-content: flex-start;
+  }
+}
+
+.meta-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.meta-rating-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: rgba(245, 184, 65, 0.15);
+  color: var(--accent-secondary);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  border: 1px solid rgba(245, 184, 65, 0.4);
+}
+
+.movie-genres-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+@media (min-width: 768px) {
+  .movie-genres-list {
+    justify-content: flex-start;
+  }
+}
+
+.genre-pill {
+  font-size: var(--font-size-xs);
+  background-color: var(--surface-elevated);
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+}
+
+.movie-synopsis-text {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 720px;
+  margin-top: var(--space-2);
+}
+
+.movie-trailer-cta {
+  margin-top: var(--space-2);
+}
+
+/* Cast */
+.movie-cast-container {
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cast-scroll-row {
+  display: flex;
+  gap: var(--space-4);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.cast-member-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 100px;
+  max-width: 100px;
+}
+
+.cast-avatar-box {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background-color: var(--surface-elevated);
+  margin-bottom: var(--space-2);
+  border: 1px solid var(--border-color);
+}
+
+.cast-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cast-avatar-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-weight: 700;
+  color: var(--accent-primary);
+  font-size: var(--font-size-lg);
+}
+
+.cast-name {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.cast-char {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+/* Shows */
+.movie-shows-container {
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-16);
+}
+
+.shows-loading-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.theatres-shows-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.theatre-showtimes-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.theatre-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: var(--space-3);
+}
+
+.theatre-head-title {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.theatre-head-address {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.theatre-dist-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-success);
+  background-color: var(--color-success-bg);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.theatre-chips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* Trailer Video */
+.trailer-video-responsive {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: #000;
+}
+
+.trailer-video-responsive iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}

@@ -1,0 +1,111 @@
+.seat-map-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 80px; /* Space for sticky summary bar */
+}
+
+.seat-screen-indicator-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: var(--space-8);
+}
+
+.seat-screen-arc {
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, transparent 0%, var(--accent-primary) 50%, transparent 100%);
+  border-radius: 50% 50% 0 0;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.4);
+}
+
+.seat-screen-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  margin-top: var(--space-2);
+}
+
+.seat-map-scroll-area {
+  width: 100%;
+  overflow-x: auto;
+  padding: var(--space-4) 0;
+  display: flex;
+  justify-content: center;
+  -webkit-overflow-scrolling: touch;
+}
+
+.seat-map-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: max-content;
+  padding: 0 var(--space-4);
+}
+
+.seat-category-tier-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.category-tier-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+
+.tier-name {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+
+.tier-price {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.category-rows-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.seat-row-label {
+  width: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+  user-select: none;
+}
+
+.seat-row-cells {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.seat-aisle-spacer {
+  width: 16px;
+  height: 28px;
+}

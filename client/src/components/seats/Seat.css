@@ -1,0 +1,78 @@
+.seat-item {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .seat-item {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+  }
+}
+
+.seat-number-label {
+  pointer-events: none;
+}
+
+/* Available States by Category */
+.seat-available.seat-cat-standard {
+  background-color: var(--surface-color);
+  border-color: #3B82F6;
+  color: #93C5FD;
+}
+
+.seat-available.seat-cat-premium {
+  background-color: var(--surface-color);
+  border-color: #A855F7;
+  color: #D8B4FE;
+}
+
+.seat-available.seat-cat-vip {
+  background-color: var(--surface-color);
+  border-color: #F59E0B;
+  color: #FDE68A;
+}
+
+.seat-available:hover:not(:disabled) {
+  transform: scale(1.15);
+  box-shadow: 0 0 8px rgba(225, 29, 72, 0.4);
+}
+
+/* Selected State */
+.seat-selected {
+  background-color: var(--color-success) !important;
+  border-color: var(--color-success) !important;
+  color: #0B0B10 !important;
+  font-weight: 700 !important;
+  transform: scale(1.05);
+}
+
+/* Held State */
+.seat-held {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  color: var(--color-warning) !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Booked State */
+.seat-booked {
+  background-color: var(--surface-elevated) !important;
+  border-color: var(--border-color) !important;
+  color: #3E3E50 !important;
+  cursor: not-allowed;
+  opacity: 0.4;
+}

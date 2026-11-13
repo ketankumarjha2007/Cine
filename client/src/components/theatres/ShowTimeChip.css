@@ -1,0 +1,50 @@
+.show-time-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--color-success);
+  transition: all var(--transition-fast);
+  min-width: 90px;
+}
+
+.show-time-chip:hover:not(:disabled) {
+  border-color: var(--color-success);
+  background-color: var(--surface-hover);
+  transform: translateY(-2px);
+}
+
+.show-time-chip.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: var(--border-subtle);
+  color: var(--text-muted);
+}
+
+.chip-time {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.chip-details {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.chip-format {
+  font-weight: 600;
+  color: var(--accent-primary);
+}
+
+.chip-price {
+  font-weight: 500;
+}
