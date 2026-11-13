@@ -49,7 +49,7 @@ export default function BookingSummaryBar({
             onClick={onProceed}
             loading={loading}
           >
-            Proceed to Checkout
+            Add Member Details & Pay
           </Button>
         </div>
       </div>

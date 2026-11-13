@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShieldCheck, AlertCircle, ArrowLeft, CreditCard } from 'lucide-react';
+import { ShieldCheck, AlertCircle, ArrowLeft, CreditCard, Users, XCircle } from 'lucide-react';
 import api from '../services/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useBooking } from '../context/BookingContext.jsx';
@@ -16,12 +16,13 @@ export default function Checkout() {
   const { bookingId } = useParams();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const { activeBooking, getAttendeesForBooking } = useBooking();
-  const attendees = getAttendeesForBooking(bookingId) || activeBooking?.attendees || [];
+  const { activeBooking, saveAttendeesForBooking, getAttendeesForBooking } = useBooking();
 
   const [booking, setBooking] = useState(null);
+  const [attendees, setAttendees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [releasing, setReleasing] = useState(false);
   const [paymentError, setPaymentError] = useState('');
 
   // Fetch Booking Details
@@ -44,6 +45,23 @@ export default function Checkout() {
         }
 
         setBooking(data);
+
+        // Initialize attendees for each booked seat
+        const existingAttendees = getAttendeesForBooking(bookingId);
+        const seatsList = data.booking_seats || [];
+        const initial = seatsList.map((bs, idx) => {
+          const existing = existingAttendees?.[idx];
+          return {
+            seatId: bs.seat_id || bs.seat?.id,
+            seatLabel: `Row ${bs.seat?.row_label} - Seat ${bs.seat?.seat_number} (${bs.seat?.category})`,
+            category: bs.seat?.category,
+            price: bs.price,
+            name: existing?.name || (idx === 0 ? (profile?.full_name || '') : ''),
+            age: existing?.age || '',
+            gender: existing?.gender || 'Not Specified'
+          };
+        });
+        setAttendees(initial);
       } catch (err) {
         console.error('[LOAD BOOKING ERROR]', err);
         alert(`Failed to load booking: ${err.message}`);
@@ -54,7 +72,17 @@ export default function Checkout() {
     }
 
     fetchBookingDetails();
-  }, [bookingId, navigate]);
+  }, [bookingId, navigate, profile?.full_name]);
+
+  const handleUpdateAttendee = (idx, field, value) => {
+    setAttendees((prev) => {
+      const copy = [...prev];
+      if (copy[idx]) {
+        copy[idx] = { ...copy[idx], [field]: value };
+      }
+      return copy;
+    });
+  };
 
   // Handle countdown expiration
   const handleHoldExpired = async () => {
@@ -71,8 +99,47 @@ export default function Checkout() {
     }
   };
 
+  // Explicitly release hold and pick other seats
+  const handleReleaseAndCancel = async () => {
+    if (!window.confirm('Are you sure you want to release these held seats? They will immediately be made available for other users.')) {
+      return;
+    }
+    try {
+      setReleasing(true);
+      await api.post(`/bookings/${bookingId}/release`);
+      const showId = booking?.shows?.id;
+      if (showId) {
+        navigate(`/seats/${showId}`, { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
+    } catch (err) {
+      console.error('[RELEASE ERROR]', err);
+      navigate('/');
+    } finally {
+      setReleasing(false);
+    }
+  };
+
   const handlePay = async () => {
     setPaymentError('');
+
+    // Validate all attendee fields
+    for (let i = 0; i < attendees.length; i++) {
+      const att = attendees[i];
+      if (!att.name || !att.name.trim()) {
+        setPaymentError(`Please provide the full name for Member ${i + 1} (${att.seatLabel}).`);
+        return;
+      }
+      if (!att.age || Number(att.age) < 3 || Number(att.age) > 115) {
+        setPaymentError(`Please enter a valid age (3 - 115) for Member ${i + 1} (${att.name}).`);
+        return;
+      }
+    }
+
+    // Save attendees locally and persist with booking
+    saveAttendeesForBooking(bookingId, attendees);
+
     setPaying(true);
 
     try {
@@ -89,7 +156,7 @@ export default function Checkout() {
         description: `Movie Tickets: ${booking.shows?.movie?.title}`,
         order_id: orderId,
         prefill: {
-          name: profile?.full_name || user?.email?.split('@')[0] || 'Movie Goer',
+          name: attendees[0]?.name || profile?.full_name || user?.email?.split('@')[0] || 'Movie Goer',
           email: user?.email || '',
           contact: profile?.phone || ''
         },
@@ -162,7 +229,7 @@ export default function Checkout() {
         <div className="checkout-header-row">
           <div>
             <h1 className="checkout-page-title">Order Checkout</h1>
-            <p className="checkout-page-subtitle">Review booking summary and complete secure payment</p>
+            <p className="checkout-page-subtitle">Enter moviegoer details and complete secure payment</p>
           </div>
 
           <CountdownTimer
@@ -179,8 +246,9 @@ export default function Checkout() {
         )}
 
         <div className="checkout-grid">
-          {/* Left Column: Film & Cinema Summary */}
+          {/* Left Column: Film Info & Member Details Forms */}
           <div className="checkout-details-column">
+            {/* Screening Details */}
             <div className="checkout-card">
               <h2 className="card-section-title">Screening Details</h2>
 
@@ -210,7 +278,7 @@ export default function Checkout() {
               <div className="checkout-divider" />
 
               <div className="checkout-seats-info">
-                <span className="seats-heading">Selected Seats ({seats.length})</span>
+                <span className="seats-heading">Reserved Seats ({seats.length})</span>
                 <div className="checkout-seats-tags">
                   {seats.map((bs) => (
                     <span key={bs.id} className="seat-summary-tag">
@@ -219,27 +287,83 @@ export default function Checkout() {
                   ))}
                 </div>
               </div>
+            </div>
 
-              {attendees.length > 0 && (
-                <>
-                  <div className="checkout-divider" />
-                  <div className="checkout-members-info">
-                    <span className="seats-heading">Attending Members ({attendees.length})</span>
-                    <div className="checkout-members-list">
-                      {attendees.map((att, idx) => (
-                        <div key={idx} className="checkout-member-item">
-                          <span className="member-name-tag">
-                            <strong>{att.name || `Member ${idx + 1}`}</strong>
-                            {att.age ? ` (${att.age} yrs)` : ''}
-                            {att.gender && att.gender !== 'Not Specified' ? ` • ${att.gender}` : ''}
-                          </span>
-                          <span className="member-seat-badge">{att.seatLabel || `Seat ${idx + 1}`}</span>
-                        </div>
-                      ))}
+            {/* Prominent Member / Attendee Details Card */}
+            <div className="checkout-card members-card">
+              <div className="card-header-with-badge">
+                <div className="card-title-group">
+                  <Users size={18} className="section-title-icon" />
+                  <h2 className="card-section-title">Ticket Holders & Member Information</h2>
+                </div>
+                <span className="members-count-badge">
+                  {attendees.length} {attendees.length === 1 ? 'Member' : 'Members'}
+                </span>
+              </div>
+              <p className="card-section-desc">
+                Please enter the details for each person attending this screening. These will be printed on your admission pass and bill.
+              </p>
+
+              <div className="checkout-members-forms-list">
+                {attendees.map((att, idx) => (
+                  <div key={idx} className="checkout-member-form-card">
+                    <div className="member-form-header">
+                      <span className="member-form-number">
+                        Member {idx + 1} {idx === 0 ? '(Primary / You)' : ''}
+                      </span>
+                      <span className="member-form-seat-tag">
+                        {att.seatLabel}
+                      </span>
+                    </div>
+
+                    <div className="member-form-inputs-grid">
+                      <div className="member-input-group name-group">
+                        <label className="member-input-label">
+                          Full Name <span className="req-dot">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={att.name}
+                          onChange={(e) => handleUpdateAttendee(idx, 'name', e.target.value)}
+                          placeholder={idx === 0 ? 'Your full name' : `Member ${idx + 1} full name`}
+                          className="member-form-input"
+                          required
+                        />
+                      </div>
+
+                      <div className="member-input-group age-group">
+                        <label className="member-input-label">
+                          Age <span className="req-dot">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          min="3"
+                          max="115"
+                          value={att.age}
+                          onChange={(e) => handleUpdateAttendee(idx, 'age', e.target.value)}
+                          placeholder="Age"
+                          className="member-form-input"
+                          required
+                        />
+                      </div>
+
+                      <div className="member-input-group gender-group">
+                        <label className="member-input-label">Gender</label>
+                        <select
+                          value={att.gender}
+                          onChange={(e) => handleUpdateAttendee(idx, 'gender', e.target.value)}
+                          className="member-form-input member-select"
+                        >
+                          <option value="Not Specified">Not Specified</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
-                </>
-              )}
+                ))}
+              </div>
             </div>
 
             {/* Cancellation Policy Notice */}
@@ -278,6 +402,19 @@ export default function Checkout() {
                 <ShieldCheck size={14} />
                 <span>256-bit SSL encrypted test payment gateway</span>
               </p>
+
+              <div className="checkout-release-hold-wrap">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  fullWidth
+                  icon={XCircle}
+                  onClick={handleReleaseAndCancel}
+                  loading={releasing}
+                >
+                  Release Seats & Choose Different Show
+                </Button>
+              </div>
             </div>
           </div>
         </div>

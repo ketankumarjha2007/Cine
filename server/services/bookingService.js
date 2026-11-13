@@ -5,6 +5,31 @@ import { razorpayInstance } from '../config/razorpay.js';
 
 export const bookingService = {
   async holdSeats({ userId, showId, seatIds }) {
+    // 1. Release any existing pending holds for this user first
+    // This strictly restricts each user to 1 active hold at a time and prevents monopolizing seats
+    try {
+      const { data: existingHolds } = await supabaseAdmin
+        .from('bookings')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('status', 'PENDING');
+
+      if (existingHolds && existingHolds.length > 0) {
+        const holdIds = existingHolds.map((h) => h.id);
+        await supabaseAdmin
+          .from('bookings')
+          .update({ status: 'EXPIRED' })
+          .in('id', holdIds);
+
+        await supabaseAdmin
+          .from('booking_seats')
+          .update({ status: 'RELEASED' })
+          .in('booking_id', holdIds);
+      }
+    } catch (cleanupErr) {
+      console.warn('[CLEANUP OLD HOLDS WARN]', cleanupErr.message);
+    }
+
     const { data, error } = await supabaseAdmin.rpc('hold_seats', {
       p_user: userId,
       p_show: showId,
