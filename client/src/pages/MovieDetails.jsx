@@ -109,9 +109,12 @@ export default function MovieDetails() {
 
         if (error) throw error;
 
-        // Filter shows by active city
+        // Filter shows by active city and exclude already-started shows
+        const nowIso = new Date().toISOString();
         const cityShows = (data || []).filter(
-          (s) => s.screen?.theatre?.city?.toLowerCase() === selectedCity?.toLowerCase()
+          (s) =>
+            s.screen?.theatre?.city?.toLowerCase() === selectedCity?.toLowerCase() &&
+            s.starts_at > nowIso
         );
 
         setShows(cityShows);

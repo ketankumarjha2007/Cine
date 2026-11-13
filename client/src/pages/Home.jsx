@@ -5,6 +5,7 @@ import { calculateDistanceKm } from '../utils/distance.js';
 import PageShell from '../components/layout/PageShell.jsx';
 import HeroCarousel from '../components/movies/HeroCarousel.jsx';
 import MovieRow from '../components/movies/MovieRow.jsx';
+import SearchBar from '../components/movies/SearchBar.jsx';
 import FilterBar from '../components/movies/FilterBar.jsx';
 import TheatreCard from '../components/theatres/TheatreCard.jsx';
 import EmptyState from '../components/common/EmptyState.jsx';
@@ -18,40 +19,77 @@ export default function Home() {
   const [theatres, setTheatres] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Filters
+  // Filters & Search
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('');
+
+  // Track which movie IDs have future shows in the selected city
+  const [cityMovieIds, setCityMovieIds] = useState(null); // null = loading
 
   useEffect(() => {
     async function loadHomeData() {
       try {
         setLoading(true);
+        setCityMovieIds(null);
 
-        // Fetch active banners
-        const { data: bannerData } = await supabase
-          .from('banners')
-          .select('*')
-          .eq('active', true)
-          .order('sort_order', { ascending: true });
+        const nowIso = new Date().toISOString();
 
-        // Fetch now showing and upcoming movies
-        const { data: movieData } = await supabase
-          .from('movies')
-          .select('*')
-          .in('status', ['now_showing', 'upcoming'])
-          .order('release_date', { ascending: false });
+        // Fetch active banners, all movies, and theatres in parallel
+        const [bannerRes, movieRes, theatreRes] = await Promise.all([
+          supabase
+            .from('banners')
+            .select('*')
+            .eq('active', true)
+            .order('sort_order', { ascending: true }),
+          supabase
+            .from('movies')
+            .select('*')
+            .in('status', ['now_showing', 'upcoming'])
+            .order('release_date', { ascending: false }),
+          supabase
+            .from('theatres')
+            .select('*')
+            .eq('city', selectedCity),
+        ]);
 
-        // Fetch theatres in selected city or nearby
-        const { data: theatreData } = await supabase
-          .from('theatres')
-          .select('*')
-          .eq('city', selectedCity);
+        const theatreList = theatreRes.data || [];
+        setBanners(bannerRes.data || []);
+        setMovies(movieRes.data || []);
+        setTheatres(theatreList);
 
-        setBanners(bannerData || []);
-        setMovies(movieData || []);
-        setTheatres(theatreData || []);
+        // ── City-aware filtering for now_showing ─────────────────────────────
+        // Get all future scheduled shows in this city via theatre->screen->show join
+        const theatreIds = theatreList.map((t) => t.id);
+
+        if (theatreIds.length > 0) {
+          // Get screens for these theatres
+          const { data: screenData } = await supabase
+            .from('screens')
+            .select('id')
+            .in('theatre_id', theatreIds);
+
+          const screenIds = (screenData || []).map((sc) => sc.id);
+
+          if (screenIds.length > 0) {
+            const { data: showData } = await supabase
+              .from('shows')
+              .select('movie_id')
+              .in('screen_id', screenIds)
+              .eq('status', 'scheduled')
+              .gt('starts_at', nowIso);
+
+            const ids = new Set((showData || []).map((s) => s.movie_id));
+            setCityMovieIds(ids);
+          } else {
+            setCityMovieIds(new Set());
+          }
+        } else {
+          setCityMovieIds(new Set());
+        }
       } catch (err) {
         console.error('[HOME FETCH ERROR]', err);
+        setCityMovieIds(new Set());
       } finally {
         setLoading(false);
       }
@@ -67,6 +105,15 @@ export default function Home() {
 
   // Filtered movies
   const filteredMovies = movies.filter((m) => {
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchTitle = m.title?.toLowerCase().includes(q);
+      const matchGenre = m.genres?.some((g) => g.toLowerCase().includes(q));
+      const matchLang = m.language?.toLowerCase().includes(q);
+      if (!matchTitle && !matchGenre && !matchLang) {
+        return false;
+      }
+    }
     if (selectedLanguage && m.language?.toLowerCase() !== selectedLanguage.toLowerCase()) {
       return false;
     }
@@ -76,7 +123,11 @@ export default function Home() {
     return true;
   });
 
-  const nowShowingMovies = filteredMovies.filter((m) => m.status === 'now_showing');
+  // now_showing: only include movies that have a future scheduled show in the selected city
+  const nowShowingMovies = filteredMovies.filter(
+    (m) => m.status === 'now_showing' && (cityMovieIds === null || cityMovieIds.has(m.id))
+  );
+  // upcoming: show all upcoming regardless of scheduling (they may not be scheduled yet)
   const upcomingMovies = filteredMovies.filter((m) => m.status === 'upcoming');
 
   // Calculate distances for theatres if coordinates present
@@ -107,6 +158,14 @@ export default function Home() {
       <HeroCarousel banners={banners} fallbackMovies={nowShowingMovies} />
 
       <div className="container home-content-container">
+        {/* Search Bar */}
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          onClear={() => setSearchQuery('')}
+          placeholder="Search movies by title, genre, or language..."
+        />
+
         {/* Filter Bar */}
         <FilterBar
           selectedLanguage={selectedLanguage}
@@ -118,6 +177,7 @@ export default function Home() {
           onReset={() => {
             setSelectedLanguage('');
             setSelectedGenre('');
+            setSearchQuery('');
           }}
         />
 
@@ -127,7 +187,11 @@ export default function Home() {
           subtitle={`Latest theatrical releases playing in ${selectedCity}`}
           movies={nowShowingMovies}
           loading={loading}
-          emptyMessage={`No movies currently showing in ${selectedCity} matching your filters.`}
+          emptyMessage={
+            searchQuery
+              ? `No now-showing movies in ${selectedCity} matching "${searchQuery}".`
+              : `No movies currently showing in ${selectedCity} matching your filters.`
+          }
         />
 
         {/* Coming Soon Section */}
@@ -136,7 +200,11 @@ export default function Home() {
           subtitle="Anticipated upcoming blockbusters arriving soon in cinemas"
           movies={upcomingMovies}
           loading={loading}
-          emptyMessage="No upcoming titles scheduled at this moment."
+          emptyMessage={
+            searchQuery
+              ? `No upcoming movies matching "${searchQuery}".`
+              : "No upcoming titles scheduled at this moment."
+          }
         />
 
         {/* Theatres Near You Section */}
