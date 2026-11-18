@@ -157,6 +157,18 @@ export default function Home() {
       {/* Hero Carousel */}
       <HeroCarousel banners={banners} fallbackMovies={nowShowingMovies} />
 
+      {/* Bhojpuri Slogan Banner */}
+      <div className="slogan-banner">
+        <div className="slogan-inner">
+          <span className="slogan-deco slogan-deco-left">&#9654;</span>
+          <p className="slogan-text">
+            <span className="slogan-line1">फिल्म देखे के बा?</span>
+            <span className="slogan-line2">टिकट <strong>CineTicket</strong> से कटावे के बा!</span>
+          </p>
+          <span className="slogan-deco slogan-deco-right">&#9664;</span>
+        </div>
+      </div>
+
       <div className="container home-content-container">
         {/* Search Bar */}
         <SearchBar
