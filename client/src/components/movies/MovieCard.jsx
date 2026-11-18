@@ -1,25 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Film } from 'lucide-react';
 import Badge from '../common/Badge.jsx';
 import './MovieCard.css';
 
 export default function MovieCard({ movie }) {
+  const [imageError, setImageError] = useState(false);
+
   if (!movie) return null;
 
   return (
     <Link to={`/movie/${movie.id}`} className="movie-card-root">
       <div className="movie-card-poster-wrapper">
-        {movie.poster_url ? (
+        {movie.poster_url && !imageError ? (
           <img
             src={movie.poster_url}
             alt={movie.title}
             className="movie-card-poster"
             loading="lazy"
+            onError={() => setImageError(true)}
           />
         ) : (
           <div className="movie-card-placeholder">
             <Film size={36} className="placeholder-film-icon" />
+            <span style={{ fontSize: '0.75rem', textAlign: 'center', padding: '0 8px', marginTop: '4px', opacity: 0.8 }}>
+              {movie.title}
+            </span>
           </div>
         )}
 
