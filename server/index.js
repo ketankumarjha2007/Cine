@@ -18,7 +18,12 @@ const app = express();
 app.use(helmet());
 
 // CORS configuration restricted to client URL
-const allowedOrigins = [env.CLIENT_URL, 'http://localhost:5173', 'http://127.0.0.1:5173'].filter(Boolean);
+const allowedOrigins = [
+  env.CLIENT_URL,
+  'https://cine-omega-peach.vercel.app',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173'
+].filter(Boolean);
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, etc.)

@@ -1,5 +1,13 @@
 # CinTicket – Production Deployment & Operations Guide
 
+## 🌐 Live Production Links
+- **Production Web Application (Vercel)**: [https://cine-omega-peach.vercel.app](https://cine-omega-peach.vercel.app)
+- **Production REST API (Render)**: [https://cineticket-9sgk.onrender.com](https://cineticket-9sgk.onrender.com)
+- **API Health Check**: [https://cineticket-9sgk.onrender.com/api/health](https://cineticket-9sgk.onrender.com/api/health)
+- **GitHub Repository**: [https://github.com/ketankumarjha2007/Cine](https://github.com/ketankumarjha2007/Cine)
+
+---
+
 ## 1. Architecture Overview
 
 CinTicket is an enterprise-grade movie booking application built on a decoupled, production-ready stack:
