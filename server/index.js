@@ -42,6 +42,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 3. Mount Routes
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    message: 'CinTicket Cinema REST API is operational',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      bookings: '/api/bookings',
+      payments: '/api/payments',
+      admin: '/api/admin',
+      tmdb: '/api/tmdb'
+    }
+  });
+});
+
 app.use('/api/health', healthRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/payments', paymentsRoutes);
