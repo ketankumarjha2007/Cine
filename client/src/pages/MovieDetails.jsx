@@ -182,7 +182,17 @@ export default function MovieDetails() {
       });
     }
 
-    theatreGroupMap.get(theatre.id).shows.push(show);
+    // Deduplicate shows by start time per theatre so duplicate options never render
+    const theatreShows = theatreGroupMap.get(theatre.id).shows;
+    const exists = theatreShows.some((s) => s.starts_at === show.starts_at);
+    if (!exists) {
+      theatreShows.push(show);
+    }
+  });
+
+  // Sort each theatre's shows chronologically by start time
+  theatreGroupMap.forEach((group) => {
+    group.shows.sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at));
   });
 
   const theatreGroups = Array.from(theatreGroupMap.values()).sort((a, b) => {
