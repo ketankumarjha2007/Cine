@@ -34,7 +34,7 @@ export const reportService = {
               theatre:theatre_id (name)
             )
           ),
-          booking_seats (id, status)
+          booking_seats (id)
         `)
         .eq('status', 'CONFIRMED')
     ]);
@@ -48,6 +48,14 @@ export const reportService = {
       return dateStr >= from && dateStr <= to;
     });
 
+    // Deduplicate by booking ID — guards against any unexpected duplicate rows from join
+    const seen = new Set();
+    const uniqueBookings = filteredBookings.filter((b) => {
+      if (seen.has(b.id)) return false;
+      seen.add(b.id);
+      return true;
+    });
+
     // Aggregations
     let totalRevenue = 0;
     let totalSeats = 0;
@@ -55,11 +63,10 @@ export const reportService = {
     const theatreBreakdown = {};
     const dailyMap = {};
 
-    filteredBookings.forEach((b) => {
+    uniqueBookings.forEach((b) => {
       const amount = Number(b.total_amount) || 0;
-      const bookedSeatsCount = (b.booking_seats || []).filter(
-        (s) => s.status === 'BOOKED'
-      ).length || (b.booking_seats || []).length || 1;
+      // Count all seats belonging to this confirmed booking
+      const bookedSeatsCount = (b.booking_seats || []).length || 1;
 
       totalRevenue += amount;
       totalSeats += bookedSeatsCount;
@@ -107,7 +114,7 @@ export const reportService = {
       period: { from, to },
       summary: {
         totalRevenue: Math.round(totalRevenue * 100) / 100,
-        totalBookings: filteredBookings.length,
+        totalBookings: uniqueBookings.length,
         totalSeats,
         totalMovies: moviesCountRes.count || 0,
         activeTheatres: theatresCountRes.count || 0,
