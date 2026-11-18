@@ -59,8 +59,13 @@ export default function SeatSelection() {
           .single();
 
         if (error) throw error;
-        setShowData(data);
-        setSelectedShow(data);
+        if (data) {
+          if (typeof data.price_by_category === 'string') {
+            try { data.price_by_category = JSON.parse(data.price_by_category); } catch {}
+          }
+          setShowData(data);
+          setSelectedShow(data);
+        }
       } catch (err) {
         console.error('[FETCH SHOW ERROR]', err);
       } finally {

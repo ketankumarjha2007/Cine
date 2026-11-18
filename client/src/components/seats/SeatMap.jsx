@@ -28,8 +28,20 @@ export default function SeatMap({
     a.rowLabel.localeCompare(b.rowLabel)
   );
 
-  // Group into category sections: VIP first (or top to bottom), Premium, Standard
-  const categoryOrder = { 'VIP': 1, 'Premium': 2, 'Standard': 3 };
+  // Group into category sections ordered from Screen (top) to Back (bottom):
+  // 1. Standard (closest to the screen, affordable)
+  // 2. Premium (optimal middle view)
+  // 3. Recliner / VIP (farthest from screen, luxury back-row experience)
+  const categoryOrder = {
+    'Standard': 1,
+    'Classic': 1,
+    'Executive': 1,
+    'Premium': 2,
+    'Club': 2,
+    'Recliner': 3,
+    'VIP': 3,
+    'Prime': 3
+  };
   const categorySectionsMap = new Map();
 
   sortedRows.forEach((row) => {
@@ -64,7 +76,10 @@ export default function SeatMap({
       <div className="theatre-seating-floor-scroll">
         <div className="theatre-seating-matrix" role="grid" aria-label="Auditorium Seating Matrix">
           {sortedCategories.map(([catName, rows]) => {
-            const samplePrice = rows[0]?.seats[0]?.price || 200;
+            const rawPrice = Number(rows[0]?.seats[0]?.price);
+            const samplePrice = (!isNaN(rawPrice) && rawPrice > 0)
+              ? rawPrice
+              : (catName.toLowerCase() === 'recliner' ? 550 : catName.toLowerCase() === 'vip' ? 500 : catName.toLowerCase() === 'premium' ? 350 : 220);
             const isVip = catName.toLowerCase() === 'vip';
 
             return (

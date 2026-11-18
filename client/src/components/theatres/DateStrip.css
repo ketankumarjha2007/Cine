@@ -1,9 +1,108 @@
+.date-strip-wrapper {
+  width: 100%;
+  margin-bottom: var(--space-6);
+}
+
+.date-strip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+  padding: 0 var(--space-1);
+}
+
+.date-strip-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.date-strip-title .cal-icon {
+  color: var(--accent-primary);
+}
+
+.date-strip-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.strip-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.strip-nav-btn:hover {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.date-picker-label {
+  position: relative;
+  cursor: pointer;
+}
+
+.hidden-date-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}
+
+.cal-picker-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.cal-picker-pill:hover {
+  background: var(--surface-elevated);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
 .date-strip-root {
   width: 100%;
   overflow-x: auto;
   padding: var(--space-2) 0;
   border-bottom: 1px solid var(--border-color);
-  margin-bottom: var(--space-6);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.date-strip-root::-webkit-scrollbar {
+  height: 6px;
+}
+
+.date-strip-root::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
 }
 
 .date-strip-container {
@@ -24,6 +123,11 @@
   color: var(--text-secondary);
   transition: all var(--transition-fast);
   min-width: 68px;
+  cursor: pointer;
+}
+
+.date-chip.weekend {
+  border-color: rgba(225, 29, 72, 0.25);
 }
 
 .date-chip:hover {
@@ -33,9 +137,10 @@
 }
 
 .date-chip-active {
-  background-color: var(--accent-primary);
-  border-color: var(--accent-primary);
-  color: #FFFFFF;
+  background-color: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
 }
 
 .date-chip-day-name {

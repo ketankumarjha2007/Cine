@@ -77,7 +77,8 @@ export default function Home() {
               .select('movie_id')
               .in('screen_id', screenIds)
               .eq('status', 'scheduled')
-              .gt('starts_at', nowIso);
+              .gt('starts_at', nowIso)
+              .limit(5000);
 
             const ids = new Set((showData || []).map((s) => s.movie_id));
             setCityMovieIds(ids);

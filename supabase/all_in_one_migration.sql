@@ -254,6 +254,7 @@ DECLARE
     v_total NUMERIC(10, 2) := 0;
     v_seat_price NUMERIC(10, 2);
     v_cur_seat UUID;
+    v_pricing JSONB;
 BEGIN
     v_seat_count := array_length(p_seats, 1);
     IF v_seat_count IS NULL OR v_seat_count = 0 THEN
@@ -282,6 +283,17 @@ BEGIN
         RAISE EXCEPTION 'Cannot book seats for a show that has already started';
     END IF;
 
+    -- Safely parse price_by_category (handle string-encoded JSONB)
+    IF jsonb_typeof(v_show.price_by_category) = 'string' THEN
+        BEGIN
+            v_pricing := (v_show.price_by_category #>> '{}')::jsonb;
+        EXCEPTION WHEN OTHERS THEN
+            v_pricing := '{"Standard": 220, "Premium": 350, "VIP": 500, "Recliner": 550}'::jsonb;
+        END;
+    ELSE
+        v_pricing := COALESCE(v_show.price_by_category, '{"Standard": 220, "Premium": 350, "VIP": 500, "Recliner": 550}'::jsonb);
+    END IF;
+
     -- Verify all seats belong to the show's screen and lock them
     PERFORM id
     FROM public.seats
@@ -300,7 +312,18 @@ BEGIN
             RAISE EXCEPTION 'Seat % does not belong to the selected screen', v_cur_seat;
         END IF;
 
-        v_seat_price := COALESCE((v_show.price_by_category->>v_seat.category)::NUMERIC, 200.00);
+        v_seat_price := COALESCE(
+            (v_pricing->>v_seat.category)::NUMERIC,
+            (v_pricing->>initcap(v_seat.category))::NUMERIC,
+            (v_pricing->>upper(v_seat.category))::NUMERIC,
+            (v_pricing->>lower(v_seat.category))::NUMERIC,
+            CASE
+                WHEN lower(v_seat.category) = 'recliner' THEN 550.00
+                WHEN lower(v_seat.category) = 'vip' THEN 500.00
+                WHEN lower(v_seat.category) = 'premium' THEN 350.00
+                ELSE 220.00
+            END
+        );
         v_subtotal := v_subtotal + v_seat_price;
     END LOOP;
 
@@ -329,7 +352,18 @@ BEGIN
             FROM public.seats
             WHERE id = v_cur_seat;
 
-            v_seat_price := COALESCE((v_show.price_by_category->>v_seat.category)::NUMERIC, 200.00);
+            v_seat_price := COALESCE(
+                (v_pricing->>v_seat.category)::NUMERIC,
+                (v_pricing->>initcap(v_seat.category))::NUMERIC,
+                (v_pricing->>upper(v_seat.category))::NUMERIC,
+                (v_pricing->>lower(v_seat.category))::NUMERIC,
+                CASE
+                    WHEN lower(v_seat.category) = 'recliner' THEN 550.00
+                    WHEN lower(v_seat.category) = 'vip' THEN 500.00
+                    WHEN lower(v_seat.category) = 'premium' THEN 350.00
+                    ELSE 220.00
+                END
+            );
 
             INSERT INTO public.booking_seats (
                 booking_id, show_id, seat_id, price, status
@@ -562,6 +596,7 @@ RETURNS TABLE (
 ) AS $$
 DECLARE
     v_show RECORD;
+    v_pricing JSONB;
 BEGIN
     SELECT s.screen_id, s.price_by_category
     INTO v_show
@@ -572,13 +607,35 @@ BEGIN
         RAISE EXCEPTION 'Show not found';
     END IF;
 
+    -- Safely parse if price_by_category was stored as a JSON string
+    IF jsonb_typeof(v_show.price_by_category) = 'string' THEN
+        BEGIN
+            v_pricing := (v_show.price_by_category #>> '{}')::jsonb;
+        EXCEPTION WHEN OTHERS THEN
+            v_pricing := '{"Standard": 220, "Premium": 350, "VIP": 500, "Recliner": 550}'::jsonb;
+        END;
+    ELSE
+        v_pricing := COALESCE(v_show.price_by_category, '{"Standard": 220, "Premium": 350, "VIP": 500, "Recliner": 550}'::jsonb);
+    END IF;
+
     RETURN QUERY
     SELECT
         st.id AS seat_id,
         st.row_label,
         st.seat_number,
         st.category,
-        COALESCE((v_show.price_by_category->>st.category)::NUMERIC, 200.00) AS price,
+        COALESCE(
+            (v_pricing->>st.category)::NUMERIC,
+            (v_pricing->>initcap(st.category))::NUMERIC,
+            (v_pricing->>upper(st.category))::NUMERIC,
+            (v_pricing->>lower(st.category))::NUMERIC,
+            CASE
+                WHEN lower(st.category) = 'recliner' THEN 550.00
+                WHEN lower(st.category) = 'vip' THEN 500.00
+                WHEN lower(st.category) = 'premium' THEN 350.00
+                ELSE 220.00
+            END
+        ) AS price,
         CASE
             WHEN bs.status = 'BOOKED' THEN 'booked'
             WHEN bs.status = 'HELD' THEN 'held'
@@ -597,6 +654,7 @@ $$ LANGUAGE plpgsql STABLE;
 
 -- 7. Function: admin_report
 -- Aggregates revenue, bookings, and seats sold by day, movie, and theatre
+-- Uses CTE pre-aggregation for booking_seats to prevent duplicate revenue calculation on 1-to-many joins
 CREATE OR REPLACE FUNCTION public.admin_report(
     p_from DATE,
     p_to DATE
@@ -611,19 +669,27 @@ RETURNS TABLE (
 ) AS $$
 BEGIN
     RETURN QUERY
+    WITH booking_seats_agg AS (
+        SELECT
+            booking_id,
+            COUNT(id) AS seats_count
+        FROM public.booking_seats
+        WHERE status = 'BOOKED'
+        GROUP BY booking_id
+    )
     SELECT
         b.confirmed_at::DATE AS report_date,
         m.title AS movie_title,
         t.name AS theatre_name,
-        COUNT(DISTINCT b.id) AS total_bookings,
-        COUNT(bs.id) AS seats_sold,
+        COUNT(b.id) AS total_bookings,
+        COALESCE(SUM(bs.seats_count), 0)::BIGINT AS seats_sold,
         COALESCE(SUM(b.total_amount), 0)::NUMERIC(12, 2) AS total_revenue
     FROM public.bookings b
     JOIN public.shows s ON s.id = b.show_id
     JOIN public.movies m ON m.id = s.movie_id
     JOIN public.screens sc ON sc.id = s.screen_id
     JOIN public.theatres t ON t.id = sc.theatre_id
-    LEFT JOIN public.booking_seats bs ON bs.booking_id = b.id AND bs.status = 'BOOKED'
+    LEFT JOIN booking_seats_agg bs ON bs.booking_id = b.id
     WHERE b.status = 'CONFIRMED'
       AND b.confirmed_at::DATE >= p_from
       AND b.confirmed_at::DATE <= p_to

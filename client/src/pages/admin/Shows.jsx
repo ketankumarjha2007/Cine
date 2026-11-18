@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, AlertCircle, Filter } from 'lucide-react';
+import { Plus, Edit2, AlertCircle, Filter, RefreshCw, Calendar } from 'lucide-react';
 import api from '../../services/api.js';
 import AdminLayout from '../../components/admin/AdminLayout.jsx';
 import DataTable from '../../components/admin/DataTable.jsx';
@@ -19,9 +19,10 @@ const BLANK_FORM = {
   durationMinutes: 120,
   language: 'Hindi',
   format: '2D',
-  standardPrice: 250,
+  standardPrice: 220,
   premiumPrice: 350,
   vipPrice: 500,
+  reclinerPrice: 550,
 };
 
 export default function AdminShows() {
@@ -44,9 +45,32 @@ export default function AdminShows() {
   const [showExpired, setShowExpired] = useState(false);
 
   const [saving, setSaving] = useState(false);
+  const [syncingSchedule, setSyncingSchedule] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const setField = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  const handleSyncRollingSchedule = async () => {
+    if (
+      !window.confirm(
+        'Generate & sync rolling 30-day schedule across all 12 theatres and 48 screens? This maintains full 30-day showtimes with zero overlaps and valid cinema pricing.'
+      )
+    ) {
+      return;
+    }
+    try {
+      setSyncingSchedule(true);
+      const res = await api.post('/admin/schedule/generate-rolling', { days: 30 });
+      alert(
+        `Successfully synced rolling schedule!\n\n${res.data.totalScheduled} shows scheduled across ${res.data.theatresCount} theatres for the next 30 days.`
+      );
+      fetchData();
+    } catch (err) {
+      alert(`Schedule sync error: ${err.message}`);
+    } finally {
+      setSyncingSchedule(false);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -108,7 +132,10 @@ export default function AdminShows() {
     const theatreId = show.screen?.theatre?.id ?? '';
     const screenId = show.screen?.id ?? '';
 
-    const prices = show.price_by_category || {};
+    let prices = show.price_by_category || {};
+    if (typeof prices === 'string') {
+      try { prices = JSON.parse(prices); } catch {}
+    }
 
     setForm({
       selectedMovieId: show.movie_id ?? show.movie?.id ?? '',
@@ -119,9 +146,10 @@ export default function AdminShows() {
       durationMinutes: dur,
       language: show.language || 'Hindi',
       format: show.format || '2D',
-      standardPrice: prices.Standard ?? prices.standard ?? 250,
+      standardPrice: prices.Standard ?? prices.standard ?? 220,
       premiumPrice: prices.Premium ?? prices.premium ?? 350,
       vipPrice: prices.VIP ?? prices.vip ?? 500,
+      reclinerPrice: prices.Recliner ?? prices.recliner ?? 550,
     });
 
     setEditModalOpen(true);
@@ -139,9 +167,10 @@ export default function AdminShows() {
       language: form.language,
       format: form.format,
       price_by_category: {
-        Standard: parseFloat(form.standardPrice),
-        Premium: parseFloat(form.premiumPrice),
-        VIP: parseFloat(form.vipPrice),
+        Standard: parseFloat(form.standardPrice) || 220,
+        Premium: parseFloat(form.premiumPrice) || 350,
+        VIP: parseFloat(form.vipPrice) || 500,
+        Recliner: parseFloat(form.reclinerPrice) || 550,
       },
     };
   };
@@ -237,10 +266,14 @@ export default function AdminShows() {
       key: 'pricing',
       header: 'Price Range',
       render: (s) => {
-        const prices = Object.values(s.price_by_category || {});
-        if (prices.length === 0) return '—';
-        const minP = Math.min(...prices);
-        const maxP = Math.max(...prices);
+        let prices = s.price_by_category || {};
+        if (typeof prices === 'string') {
+          try { prices = JSON.parse(prices); } catch {}
+        }
+        const vals = Object.values(prices).map(Number).filter((n) => !isNaN(n) && n > 0);
+        if (vals.length === 0) return '₹220 – ₹550';
+        const minP = Math.min(...vals);
+        const maxP = Math.max(...vals);
         return `${formatCurrency(minP)} – ${formatCurrency(maxP)}`;
       },
     },
@@ -412,7 +445,7 @@ export default function AdminShows() {
               />
             </FormField>
 
-            <FormField label="Premium">
+            <FormField label="Premium (₹)">
               <input
                 type="number"
                 min="50"
@@ -422,12 +455,22 @@ export default function AdminShows() {
               />
             </FormField>
 
-            <FormField label="VIP / Recliner">
+            <FormField label="VIP (₹)">
               <input
                 type="number"
                 min="50"
                 value={form.vipPrice}
                 onChange={(e) => setField('vipPrice', e.target.value)}
+                required
+              />
+            </FormField>
+
+            <FormField label="Recliner (₹)">
+              <input
+                type="number"
+                min="50"
+                value={form.reclinerPrice}
+                onChange={(e) => setField('reclinerPrice', e.target.value)}
                 required
               />
             </FormField>
@@ -459,6 +502,16 @@ export default function AdminShows() {
       subtitle="Schedule and manage movie screenings across auditorium screens"
       actions={
         <div className="shows-header-actions">
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={RefreshCw}
+            loading={syncingSchedule}
+            onClick={handleSyncRollingSchedule}
+            title="Refresh 30-day schedule"
+          >
+            Sync 30-Day Schedule
+          </Button>
           <Button
             variant={showExpired ? 'primary' : 'secondary'}
             size="sm"

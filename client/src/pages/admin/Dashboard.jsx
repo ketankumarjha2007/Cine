@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IndianRupee, Ticket, Armchair, TrendingUp, RefreshCw } from 'lucide-react';
+import { IndianRupee, Ticket, Armchair, TrendingUp, RefreshCw, Film, Building, Calendar, XCircle } from 'lucide-react';
 import api from '../../services/api.js';
 import { formatCurrency } from '../../utils/format.js';
 import AdminLayout from '../../components/admin/AdminLayout.jsx';
@@ -49,10 +49,10 @@ export default function Dashboard() {
         </div>
       ) : (
         <>
-          {/* Metrics Grid */}
+          {/* Database-Derived Metrics Grid */}
           <div className="dashboard-stats-grid">
             <StatCard
-              title="Total Revenue (30d)"
+              title="Actual Revenue"
               value={formatCurrency(data?.summary?.totalRevenue || 0)}
               icon={IndianRupee}
               variant="primary"
@@ -61,12 +61,28 @@ export default function Dashboard() {
               title="Confirmed Bookings"
               value={data?.summary?.totalBookings || 0}
               icon={Ticket}
+              variant="success"
             />
             <StatCard
-              title="Seats Reserved"
-              value={data?.summary?.totalSeats || 0}
-              icon={Armchair}
-              variant="success"
+              title="Cancelled Bookings"
+              value={data?.summary?.cancelledBookings || 0}
+              icon={XCircle}
+              variant="warning"
+            />
+            <StatCard
+              title="Total Movies"
+              value={data?.summary?.totalMovies || 0}
+              icon={Film}
+            />
+            <StatCard
+              title="Active Theatres"
+              value={data?.summary?.activeTheatres || 0}
+              icon={Building}
+            />
+            <StatCard
+              title="Upcoming Shows"
+              value={data?.summary?.upcomingShows || 0}
+              icon={Calendar}
             />
           </div>
 

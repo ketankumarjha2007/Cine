@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Film } from 'lucide-react';
-import Badge from '../common/Badge.jsx';
+import { Star, Film, Clock, Ticket } from 'lucide-react';
+import { formatDuration } from '../../utils/format.js';
 import './MovieCard.css';
 
 export default function MovieCard({ movie }) {
@@ -9,8 +9,10 @@ export default function MovieCard({ movie }) {
 
   if (!movie) return null;
 
+  const isUpcoming = movie.status === 'upcoming';
+
   return (
-    <Link to={`/movie/${movie.id}`} className="movie-card-root">
+    <Link to={`/movie/${movie.id}`} className="movie-card-root" title={`View details for ${movie.title}`}>
       <div className="movie-card-poster-wrapper">
         {movie.poster_url && !imageError ? (
           <img
@@ -43,6 +45,14 @@ export default function MovieCard({ movie }) {
             {movie.certificate}
           </div>
         )}
+
+        {/* Hover / CTA Bar */}
+        <div className="movie-card-hover-action">
+          <span className="movie-card-cta-btn">
+            <Ticket size={13} />
+            <span>{isUpcoming ? 'View Details' : 'Book Tickets'}</span>
+          </span>
+        </div>
       </div>
 
       <div className="movie-card-meta">
@@ -52,6 +62,12 @@ export default function MovieCard({ movie }) {
         <p className="movie-card-info">
           {movie.language} • {movie.genres?.slice(0, 2).join(', ') || 'Feature'}
         </p>
+        {movie.duration_minutes && (
+          <div className="movie-card-duration">
+            <Clock size={11} />
+            <span>{formatDuration(movie.duration_minutes)}</span>
+          </div>
+        )}
       </div>
     </Link>
   );

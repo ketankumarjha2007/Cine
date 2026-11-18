@@ -5,49 +5,116 @@ export const reportService = {
     const from = fromDate || new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
     const to = toDate || new Date().toISOString().split('T')[0];
 
-    const { data, error } = await supabaseAdmin.rpc('admin_report', {
-      p_from: from,
-      p_to: to
+    const nowIso = new Date().toISOString();
+
+    // Fetch live system counts and real confirmed bookings with related details
+    const [
+      moviesCountRes,
+      theatresCountRes,
+      upcomingShowsCountRes,
+      cancelledBookingsRes,
+      confirmedBookingsRes
+    ] = await Promise.all([
+      supabaseAdmin.from('movies').select('id', { count: 'exact', head: true }).in('status', ['now_showing', 'upcoming']),
+      supabaseAdmin.from('theatres').select('id', { count: 'exact', head: true }),
+      supabaseAdmin.from('shows').select('id', { count: 'exact', head: true }).gte('starts_at', nowIso).eq('status', 'scheduled'),
+      supabaseAdmin.from('bookings').select('id', { count: 'exact', head: true }).eq('status', 'CANCELLED'),
+      supabaseAdmin
+        .from('bookings')
+        .select(`
+          id,
+          total_amount,
+          created_at,
+          confirmed_at,
+          show:show_id (
+            id,
+            movie:movie_id (title),
+            screen:screen_id (
+              id,
+              theatre:theatre_id (name)
+            )
+          ),
+          booking_seats (id, status)
+        `)
+        .eq('status', 'CONFIRMED')
+    ]);
+
+    const bookings = confirmedBookingsRes.data || [];
+
+    // Filter bookings by date range if provided
+    const filteredBookings = bookings.filter((b) => {
+      const dateStr = (b.confirmed_at || b.created_at || '').split('T')[0];
+      if (!dateStr) return true;
+      return dateStr >= from && dateStr <= to;
     });
 
-    if (error) throw error;
-
-    // Calculate aggregated metrics
-    const totalRevenue = (data || []).reduce((sum, row) => sum + parseFloat(row.total_revenue || 0), 0);
-    const totalBookings = (data || []).reduce((sum, row) => sum + parseInt(row.total_bookings || 0, 10), 0);
-    const totalSeats = (data || []).reduce((sum, row) => sum + parseInt(row.seats_sold || 0, 10), 0);
-
-    // Group by movie
+    // Aggregations
+    let totalRevenue = 0;
+    let totalSeats = 0;
     const movieBreakdown = {};
-    // Group by theatre
     const theatreBreakdown = {};
+    const dailyMap = {};
 
-    (data || []).forEach((row) => {
-      // Movie
-      if (!movieBreakdown[row.movie_title]) {
-        movieBreakdown[row.movie_title] = { bookings: 0, seats: 0, revenue: 0 };
-      }
-      movieBreakdown[row.movie_title].bookings += parseInt(row.total_bookings, 10);
-      movieBreakdown[row.movie_title].seats += parseInt(row.seats_sold, 10);
-      movieBreakdown[row.movie_title].revenue += parseFloat(row.total_revenue);
+    filteredBookings.forEach((b) => {
+      const amount = Number(b.total_amount) || 0;
+      const bookedSeatsCount = (b.booking_seats || []).filter(
+        (s) => s.status === 'BOOKED'
+      ).length || (b.booking_seats || []).length || 1;
 
-      // Theatre
-      if (!theatreBreakdown[row.theatre_name]) {
-        theatreBreakdown[row.theatre_name] = { bookings: 0, seats: 0, revenue: 0 };
+      totalRevenue += amount;
+      totalSeats += bookedSeatsCount;
+
+      const movieTitle = b.show?.movie?.title || 'Unknown Movie';
+      const theatreName = b.show?.screen?.theatre?.name || 'Unknown Cinema';
+      const reportDate = (b.confirmed_at || b.created_at || '').split('T')[0] || from;
+
+      // Movie Breakdown
+      if (!movieBreakdown[movieTitle]) {
+        movieBreakdown[movieTitle] = { bookings: 0, seats: 0, revenue: 0 };
       }
-      theatreBreakdown[row.theatre_name].bookings += parseInt(row.total_bookings, 10);
-      theatreBreakdown[row.theatre_name].seats += parseInt(row.seats_sold, 10);
-      theatreBreakdown[row.theatre_name].revenue += parseFloat(row.total_revenue);
+      movieBreakdown[movieTitle].bookings += 1;
+      movieBreakdown[movieTitle].seats += bookedSeatsCount;
+      movieBreakdown[movieTitle].revenue = Math.round((movieBreakdown[movieTitle].revenue + amount) * 100) / 100;
+
+      // Theatre Breakdown
+      if (!theatreBreakdown[theatreName]) {
+        theatreBreakdown[theatreName] = { bookings: 0, seats: 0, revenue: 0 };
+      }
+      theatreBreakdown[theatreName].bookings += 1;
+      theatreBreakdown[theatreName].seats += bookedSeatsCount;
+      theatreBreakdown[theatreName].revenue = Math.round((theatreBreakdown[theatreName].revenue + amount) * 100) / 100;
+
+      // Daily records
+      const dailyKey = `${reportDate}_${movieTitle}_${theatreName}`;
+      if (!dailyMap[dailyKey]) {
+        dailyMap[dailyKey] = {
+          report_date: reportDate,
+          movie_title: movieTitle,
+          theatre_name: theatreName,
+          total_bookings: 0,
+          seats_sold: 0,
+          total_revenue: 0
+        };
+      }
+      dailyMap[dailyKey].total_bookings += 1;
+      dailyMap[dailyKey].seats_sold += bookedSeatsCount;
+      dailyMap[dailyKey].total_revenue = Math.round((dailyMap[dailyKey].total_revenue + amount) * 100) / 100;
     });
+
+    const dailyRecords = Object.values(dailyMap).sort((a, b) => b.report_date.localeCompare(a.report_date));
 
     return {
       period: { from, to },
       summary: {
         totalRevenue: Math.round(totalRevenue * 100) / 100,
-        totalBookings,
-        totalSeats
+        totalBookings: filteredBookings.length,
+        totalSeats,
+        totalMovies: moviesCountRes.count || 0,
+        activeTheatres: theatresCountRes.count || 0,
+        upcomingShows: upcomingShowsCountRes.count || 0,
+        cancelledBookings: cancelledBookingsRes.count || 0,
       },
-      dailyRecords: data || [],
+      dailyRecords,
       movieBreakdown,
       theatreBreakdown
     };

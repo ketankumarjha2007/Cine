@@ -467,7 +467,7 @@ async function createShows(movies, theatres, screenMap) {
             ends_at: endsAt,
             language: dbMovie?.language || 'Hindi',
             format: screen.screen_type === 'IMAX' ? 'IMAX' : '2D',
-            price_by_category: JSON.stringify({ Standard: 180, Premium: 300, VIP: 450 }),
+            price_by_category: { Standard: 220, Premium: 350, VIP: 500, Recliner: 550 },
             status: 'scheduled',
           });
         }

@@ -29,8 +29,10 @@ export default function MovieDetails() {
   const [loading, setLoading] = useState(true);
   const [trailerOpen, setTrailerOpen] = useState(false);
 
-  // Showtimes state
-  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
+  // Showtimes state in IST (Asia/Kolkata)
+  const [selectedDate, setSelectedDate] = useState(() => {
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+  });
   const [shows, setShows] = useState([]);
   const [showsLoading, setShowsLoading] = useState(true);
 
@@ -78,8 +80,11 @@ export default function MovieDetails() {
       if (!id) return;
       try {
         setShowsLoading(true);
-        const startOfDay = `${selectedDate}T00:00:00.000Z`;
-        const endOfDay = `${selectedDate}T23:59:59.999Z`;
+
+        // Precise IST calendar day bounds converted to UTC
+        const [y, m, d] = selectedDate.split('-').map(Number);
+        const startOfDay = new Date(Date.UTC(y, m - 1, d, 0, 0, 0, 0) - 330 * 60000).toISOString();
+        const endOfDay = new Date(Date.UTC(y, m - 1, d, 23, 59, 59, 999) - 330 * 60000).toISOString();
 
         const { data, error } = await supabase
           .from('shows')

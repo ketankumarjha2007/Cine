@@ -8,8 +8,20 @@ export default function ShowTimeChip({ show, onSelect }) {
   const startsAt = new Date(show.starts_at);
   const isStarted = startsAt.getTime() <= Date.now();
 
-  const prices = Object.values(show.price_by_category || {});
-  const minPrice = prices.length > 0 ? Math.min(...prices) : 200;
+  let priceObj = show.price_by_category;
+  if (typeof priceObj === 'string') {
+    try { priceObj = JSON.parse(priceObj); } catch {}
+  }
+  if (typeof priceObj === 'string') {
+    try { priceObj = JSON.parse(priceObj); } catch {}
+  }
+
+  const rawPrices = Object.values(priceObj || {});
+  const validPrices = rawPrices
+    .map((p) => Number(p))
+    .filter((n) => !isNaN(n) && n > 0);
+
+  const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : 220;
 
   return (
     <button

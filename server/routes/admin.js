@@ -7,6 +7,7 @@ import { supabaseAdmin } from '../config/supabase.js';
 import { tmdbService } from '../services/tmdbService.js';
 import { reportService } from '../services/reportService.js';
 import { bookingService } from '../services/bookingService.js';
+import { scheduleService } from '../services/scheduleService.js';
 
 const router = Router();
 
@@ -600,6 +601,32 @@ router.get('/reports/export', async (req, res, next) => {
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', `attachment; filename=cineticket-report-${Date.now()}.csv`);
     res.status(200).send(csvData);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ============================================================================
+// 7. ROLLING 30-DAY MOVIE SCHEDULING SYSTEM
+// ============================================================================
+
+router.post('/schedule/generate-rolling', async (req, res, next) => {
+  try {
+    const { days = 30 } = req.body || {};
+    const result = await scheduleService.generateRollingSchedule({
+      startDate: new Date(),
+      daysAhead: parseInt(days, 10) || 30
+    });
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/schedule/summary', async (req, res, next) => {
+  try {
+    const summary = await scheduleService.getScheduleSummary();
+    res.status(200).json(summary);
   } catch (error) {
     next(error);
   }
